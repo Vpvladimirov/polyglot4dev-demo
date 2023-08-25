@@ -1,3 +1,4 @@
+import ProtectedRoute from './components/ProtectedRoute';
 import Chat from './pages/Chat';
 import Home from './pages/Home';
 
@@ -8,7 +9,11 @@ const routes = [
   },
   {
     path: '/chat',
-    element: <Chat />,
+    element: (
+      <ProtectedRoute>
+        <Chat />
+      </ProtectedRoute>
+    ),
   },
 ];
 
