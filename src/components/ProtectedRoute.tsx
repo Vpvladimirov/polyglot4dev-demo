@@ -12,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isLoading, isLoggedIn } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <></>;
   }
 
   if (!isLoggedIn) {

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 import './App.scss';
 import routes from './routes';
-import { auth } from './Firebase';
+import { auth, remoteConfig } from './Firebase';
 import useAuth from './hooks/useAuth';
+import { fetchAndActivate } from 'firebase/remote-config';
 
 const App: React.FC = () => {
   const elements = useRoutes(routes);
@@ -13,6 +14,16 @@ const App: React.FC = () => {
   const logout = async () => {
     return auth.signOut();
   };
+
+  useEffect(() => {
+    fetchAndActivate(remoteConfig)
+      .then(() => {
+        console.log('Successfully fetched firebase remote config data');
+      })
+      .catch((err) => {
+        console.log('Error fetching the firebase remote config data', err);
+      });
+  }, []);
 
   return (
     <div className='App'>

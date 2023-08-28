@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.scss';
 import { signInAnonymously } from 'firebase/auth';
-import { auth, firestore } from '../Firebase';
+import { analytics, auth, firestore } from '../Firebase';
 import { useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
+import { logEvent } from 'firebase/analytics';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ const Home = () => {
     signInAnonymously(auth)
       .then(async (param) => {
         await setDoc(doc(firestore, 'users', param.user.uid), {
+          username,
+        });
+
+        logEvent(analytics, 'user_sign_in', {
           username,
         });
 

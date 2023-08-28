@@ -1,7 +1,7 @@
 import './Chat.scss';
 import send from '../assets/send.svg';
 import { useEffect, useState } from 'react';
-import { auth, firestore } from '../Firebase';
+import { analytics, auth, firestore, remoteConfig } from '../Firebase';
 import {
   Timestamp,
   addDoc,
@@ -10,6 +10,8 @@ import {
   getDoc,
   onSnapshot,
 } from 'firebase/firestore';
+import { logEvent } from 'firebase/analytics';
+import { getValue } from 'firebase/remote-config';
 
 interface Message {
   id: string;
@@ -23,18 +25,25 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [myUsername, setMyUsername] = useState('');
 
+  const chatTitle = getValue(remoteConfig, 'chat_title').asString();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
   };
 
   const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('newMessage', newMessage);
+
     await await addDoc(collection(firestore, 'messages'), {
       username: myUsername,
       text: newMessage,
       date: new Date(),
     });
+
+    logEvent(analytics, 'message_written', {
+      text: newMessage,
+    });
+
     setNewMessage('');
   };
 
@@ -87,7 +96,7 @@ const Chat = () => {
 
   return (
     <div className='chat-container'>
-      <h1>Chat room</h1>
+      <h1>{chatTitle}</h1>
       <div className='chat'>
         <div className='messages-container'>
           {allMessages.map((message) => (

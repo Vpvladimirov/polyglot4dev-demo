@@ -1,4 +1,4 @@
-import { getAnalytics, logEvent as firebaseLogEvent } from 'firebase/analytics';
+import { getAnalytics } from 'firebase/analytics';
 import { initializeApp } from 'firebase/app';
 import { getRemoteConfig } from 'firebase/remote-config';
 import { getFirestore } from 'firebase/firestore';
@@ -16,8 +16,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
-export const logEvent = firebaseLogEvent;
 export const remoteConfig = getRemoteConfig(app);
-remoteConfig.settings.minimumFetchIntervalMillis = 3600000;
+remoteConfig.settings.minimumFetchIntervalMillis = 10000;
+remoteConfig.defaultConfig = {
+  chat_title: 'Chat room',
+};
 export const firestore = getFirestore(app);
 export const auth = getAuth();
