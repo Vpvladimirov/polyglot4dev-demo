@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getRemoteConfig } from 'firebase/remote-config';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB2HMaI2zE16HjuiP-QKOChvLe2bW4yM60',
@@ -23,3 +24,4 @@ remoteConfig.defaultConfig = {
 };
 export const firestore = getFirestore(app);
 export const auth = getAuth();
+export const storage = getStorage();

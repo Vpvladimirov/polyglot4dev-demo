@@ -4,12 +4,22 @@
   color: #ffffff;
   min-height: 100vh;
 
-  input {
+  label {
+    cursor: pointer;
+  }
+
+  input:not([type='file']) {
     padding: 15px;
     border-radius: 10px;
     min-width: 50%;
     background-color: #3c3d4e;
     color: #ffffff;
+  }
+
+  input[type='file'] {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
   }
 
   .logout-button {

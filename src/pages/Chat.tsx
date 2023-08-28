@@ -1,7 +1,8 @@
 import './Chat.scss';
 import send from '../assets/send.svg';
+import upload from '../assets/upload.svg';
 import { useEffect, useState } from 'react';
-import { analytics, auth, firestore, remoteConfig } from '../Firebase';
+import { analytics, auth, firestore, remoteConfig, storage } from '../Firebase';
 import {
   Timestamp,
   addDoc,
@@ -12,18 +13,26 @@ import {
 } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 import { getValue } from 'firebase/remote-config';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 interface Message {
   id: string;
   username: string;
   text: string;
   date: Timestamp;
+  isImage: boolean;
+}
+
+interface ImagesUrlsMap {
+  [index: string]: string;
 }
 
 const Chat = () => {
   const [allMessages, setAllMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [myUsername, setMyUsername] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [imagesUrlsMap, setImagesUrlsMap] = useState<ImagesUrlsMap>({});
 
   const chatTitle = getValue(remoteConfig, 'chat_title').asString();
 
@@ -31,20 +40,77 @@ const Chat = () => {
     setNewMessage(e.target.value);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+
   const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    await await addDoc(collection(firestore, 'messages'), {
-      username: myUsername,
-      text: newMessage,
-      date: new Date(),
-    });
+    if (newMessage) {
+      await addDoc(collection(firestore, 'messages'), {
+        username: myUsername,
+        text: newMessage,
+        date: new Date(),
+        isImage: false,
+      });
 
-    logEvent(analytics, 'message_written', {
-      text: newMessage,
-    });
+      logEvent(analytics, 'message_written', {
+        text: newMessage,
+      });
+    }
+
+    if (file) {
+      const fileName = `${Date.now()}-${file.name}`;
+      const storageRef = ref(storage, fileName);
+
+      await uploadBytes(storageRef, file);
+
+      await addDoc(collection(firestore, 'messages'), {
+        username: myUsername,
+        text: fileName,
+        date: new Date(),
+        isImage: true,
+      });
+
+      logEvent(analytics, 'file_uploaded');
+    }
 
     setNewMessage('');
+    setFile(null);
+  };
+
+  const fetchImagesURLs = async (messages: Message[]) => {
+    const newImagesUrlsMap: ImagesUrlsMap = {};
+
+    for (const message of messages) {
+      if (message.isImage) {
+        const imageRef = ref(storage, message.text);
+        try {
+          const url = await getDownloadURL(imageRef);
+          newImagesUrlsMap[message.text] = url;
+        } catch (e: any) {
+          switch (e.code) {
+            case 'storage/object-not-found':
+              console.log('File does not exist.');
+              break;
+            case 'storage/unauthorized':
+              console.log('No permission to access the file.');
+              break;
+            case 'storage/canceled':
+              console.log('User has canceled the upload.');
+              break;
+            case 'storage/unknown':
+              console.log('Unknown error');
+              break;
+          }
+        }
+      }
+    }
+
+    setImagesUrlsMap(newImagesUrlsMap);
   };
 
   const sortByDate = (a: Message, b: Message) => {
@@ -87,7 +153,7 @@ const Chat = () => {
         }));
         newMessages = newMessages.sort(sortByDate);
         setAllMessages(newMessages);
-        console.log('newMessages', newMessages);
+        fetchImagesURLs(newMessages);
       }
     );
 
@@ -106,12 +172,31 @@ const Chat = () => {
               title={message.date.toDate().toLocaleString()}
             >
               <span className='username'>{message.username}</span>
-              <span>{message.text}</span>
+              {message.isImage ? (
+                <img src={imagesUrlsMap[message.text]} alt={message.text} />
+              ) : (
+                <span>{message.text}</span>
+              )}
             </div>
           ))}
         </div>
         <div className='bottom-container'>
           <form onSubmit={sendMessage}>
+            <div className='upload-container'>
+              <label htmlFor='upload-photo'>
+                <span className='upload-title'>
+                  {file ? file.name : 'Upload'}
+                </span>
+                <img src={upload} alt='upload' />
+              </label>
+              <input
+                type='file'
+                name='photo'
+                accept='image/*'
+                id='upload-photo'
+                onChange={handleFileChange}
+              />
+            </div>
             <input
               type='text'
               placeholder='Send a message'
