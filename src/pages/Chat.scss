@@ -1,75 +1,70 @@
 .chat-container {
-  padding: 2rem 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
 
-  .chat {
-    border-radius: 30px;
-    height: 87vh;
-    position: relative;
+  .messages-container {
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
 
-    .messages-container {
-      overflow: auto;
-      height: 73vh;
-      display: flex;
-      flex-direction: column-reverse;
+    .message {
+      padding: 15px 27%;
+      text-align: left;
 
-      .message {
-        padding: 15px 27%;
-        text-align: left;
-
-        @media screen and (max-width: 600px) {
-          & {
-            padding-left: 15%;
-            padding-right: 15%;
-          }
+      @media screen and (max-width: 600px) {
+        & {
+          padding-left: 15%;
+          padding-right: 15%;
         }
+      }
 
-        &:nth-child(2n-1) {
-          background-color: #3c3d4e;
-        }
+      &:nth-child(2n-1) {
+        background-color: #3c3d4e;
+      }
 
-        .username {
-          margin-right: 20px;
-          font-weight: 900;
-        }
+      .username {
+        margin-right: 20px;
+        font-weight: 900;
+      }
 
-        img {
-          max-width: 100%;
+      img {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .bottom-container {
+    width: 100%;
+    padding: 1rem 0;
+
+    .upload-container {
+      display: inline;
+      vertical-align: middle;
+      margin-right: 10px;
+      margin-bottom: 5px;
+
+      .upload-title {
+        margin-right: 5px;
+      }
+
+      @media screen and (max-width: 600px) {
+        & {
+          display: block;
         }
       }
     }
 
-    .bottom-container {
-      position: absolute;
-      width: 100%;
-      bottom: 30px;
+    button {
+      margin-left: -50px;
+      background-color: transparent;
+      border: none;
+      vertical-align: middle;
+      cursor: pointer;
 
-      .upload-container {
-        display: inline;
-        vertical-align: middle;
-        margin-right: 10px;
-        margin-bottom: 5px;
-
-        .upload-title {
-          margin-right: 5px;
-        }
-
-        @media screen and (max-width: 600px) {
-          & {
-            display: block;
-          }
-        }
-      }
-
-      button {
-        margin-left: -50px;
-        background-color: transparent;
-        border: none;
-        vertical-align: middle;
-        cursor: pointer;
-
-        &:hover {
-          transform: scale(1.1);
-        }
+      &:hover {
+        transform: scale(1.1);
       }
     }
   }

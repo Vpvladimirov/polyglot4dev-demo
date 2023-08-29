@@ -1,8 +1,12 @@
 .App {
   text-align: center;
-  background-color: #282c34;
-  color: #ffffff;
-  min-height: 100vh;
+  height: 100vh;
+
+  @media screen and (max-width: 600px) {
+    & {
+      height: 87vh;
+    }
+  }
 
   label {
     cursor: pointer;
@@ -23,10 +27,11 @@
   }
 
   .logout-button {
+    position: absolute;
+    right: 0;
     padding: 10px;
     background-color: transparent;
     border: none;
-    float: right;
     color: #ffffff;
     cursor: pointer;
   }

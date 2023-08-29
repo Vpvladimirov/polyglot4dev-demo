@@ -1,6 +1,12 @@
 html,
 body {
   overflow: hidden;
+  position: relative;
+}
+
+html {
+  background-color: #282c34;
+  color: #ffffff;
 }
 
 body {

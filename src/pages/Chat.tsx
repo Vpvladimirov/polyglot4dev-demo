@@ -163,52 +163,50 @@ const Chat = () => {
   return (
     <div className='chat-container'>
       <h1>{chatTitle}</h1>
-      <div className='chat'>
-        <div className='messages-container'>
-          {allMessages.map((message) => (
-            <div
-              className='message'
-              key={message.id}
-              title={message.date.toDate().toLocaleString()}
-            >
-              <span className='username'>{message.username}</span>
-              {message.isImage ? (
-                <img src={imagesUrlsMap[message.text]} alt={message.text} />
-              ) : (
-                <span>{message.text}</span>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className='bottom-container'>
-          <form onSubmit={sendMessage}>
-            <div className='upload-container'>
-              <label htmlFor='upload-photo'>
-                <span className='upload-title'>
-                  {file ? file.name : 'Upload'}
-                </span>
-                <img src={upload} alt='upload' />
-              </label>
-              <input
-                type='file'
-                name='photo'
-                accept='image/*'
-                id='upload-photo'
-                onChange={handleFileChange}
-              />
-            </div>
+      <div className='messages-container'>
+        {allMessages.map((message) => (
+          <div
+            className='message'
+            key={message.id}
+            title={message.date.toDate().toLocaleString()}
+          >
+            <span className='username'>{message.username}</span>
+            {message.isImage ? (
+              <img src={imagesUrlsMap[message.text]} alt={message.text} />
+            ) : (
+              <span>{message.text}</span>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className='bottom-container'>
+        <form onSubmit={sendMessage}>
+          <div className='upload-container'>
+            <label htmlFor='upload-photo'>
+              <span className='upload-title'>
+                {file ? file.name : 'Upload'}
+              </span>
+              <img src={upload} alt='upload' />
+            </label>
             <input
-              type='text'
-              placeholder='Send a message'
-              value={newMessage}
-              onChange={handleChange}
-              autoFocus
+              type='file'
+              name='photo'
+              accept='image/*'
+              id='upload-photo'
+              onChange={handleFileChange}
             />
-            <button type='submit'>
-              <img src={send} alt='send' />
-            </button>
-          </form>
-        </div>
+          </div>
+          <input
+            type='text'
+            placeholder='Send a message'
+            value={newMessage}
+            onChange={handleChange}
+            autoFocus
+          />
+          <button type='submit'>
+            <img src={send} alt='send' />
+          </button>
+        </form>
       </div>
     </div>
   );
