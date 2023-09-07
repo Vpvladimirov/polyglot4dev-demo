@@ -1,15 +1,13 @@
 # Chat app
 
-## евентуално anonymous login -няма да показвам facebook, google и т.н, защото няма смисъл, пък и е по-сложно
+## authentication
 
-## firestore database - вместо да ползвам сокети, ще ползвам директно "realtime" частта от базата
+## firestore database
 
-## machine learning - мисля да направя да разпознава текст от снимка и да го пиша в чата
+## storage
 
-## евентуално storage, ако реша да пазя снимките
+## remote config
 
-## remote config - мисля да направя някаква конфигурация, която да променям директно през remote config, защото според мен това е много добър feature на firebase
-
-## analytics - това е едно от най-използваните неща от firebase според мен, така че мисля да го покажа, то и без това се сетъпва за 30 секунди
+## analytics
 
 ## hosting
