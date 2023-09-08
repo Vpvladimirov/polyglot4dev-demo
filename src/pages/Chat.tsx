@@ -2,30 +2,16 @@ import './Chat.scss';
 import send from '../assets/send.svg';
 import upload from '../assets/upload.svg';
 import { useEffect, useState } from 'react';
-import { analytics, auth, firestore, remoteConfig, storage } from '../Firebase';
-import {
-  Timestamp,
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-} from 'firebase/firestore';
-import { logEvent } from 'firebase/analytics';
+import { auth, firestore, remoteConfig } from '../Firebase';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { getValue } from 'firebase/remote-config';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-
-interface Message {
-  id: string;
-  username: string;
-  text: string;
-  date: Timestamp;
-  isImage: boolean;
-}
-
-interface ImagesUrlsMap {
-  [index: string]: string;
-}
+import {
+  ImagesUrlsMap,
+  Message,
+  getImagesURLs,
+  saveFile,
+  saveMessage,
+} from '../firebase-utils';
 
 const Chat = () => {
   const [allMessages, setAllMessages] = useState<Message[]>([]);
@@ -50,32 +36,11 @@ const Chat = () => {
     e.preventDefault();
 
     if (newMessage) {
-      await addDoc(collection(firestore, 'messages'), {
-        username: myUsername,
-        text: newMessage,
-        date: new Date(),
-        isImage: false,
-      });
-
-      logEvent(analytics, 'message_written', {
-        text: newMessage,
-      });
+      await saveMessage(myUsername, newMessage);
     }
 
     if (file) {
-      const fileName = `${Date.now()}-${file.name}`;
-      const storageRef = ref(storage, fileName);
-
-      await uploadBytes(storageRef, file);
-
-      await addDoc(collection(firestore, 'messages'), {
-        username: myUsername,
-        text: fileName,
-        date: new Date(),
-        isImage: true,
-      });
-
-      logEvent(analytics, 'file_uploaded');
+      await saveFile(file, myUsername);
     }
 
     setNewMessage('');
@@ -83,32 +48,7 @@ const Chat = () => {
   };
 
   const fetchImagesURLs = async (messages: Message[]) => {
-    const newImagesUrlsMap: ImagesUrlsMap = {};
-
-    for (const message of messages) {
-      if (message.isImage) {
-        const imageRef = ref(storage, message.text);
-        try {
-          const url = await getDownloadURL(imageRef);
-          newImagesUrlsMap[message.text] = url;
-        } catch (e: any) {
-          switch (e.code) {
-            case 'storage/object-not-found':
-              console.log('File does not exist.');
-              break;
-            case 'storage/unauthorized':
-              console.log('No permission to access the file.');
-              break;
-            case 'storage/canceled':
-              console.log('User has canceled the upload.');
-              break;
-            case 'storage/unknown':
-              console.log('Unknown error');
-              break;
-          }
-        }
-      }
-    }
+    const newImagesUrlsMap = await getImagesURLs(messages);
 
     setImagesUrlsMap(newImagesUrlsMap);
   };
@@ -143,7 +83,9 @@ const Chat = () => {
     };
 
     fetchUsername();
+  }, []);
 
+  useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(firestore, 'messages'),
       (querySnapshot) => {

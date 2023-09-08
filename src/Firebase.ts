@@ -17,12 +17,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const analytics = getAnalytics(app);
+export const auth = getAuth();
+export const firestore = getFirestore(app);
+export const storage = getStorage();
 export const remoteConfig = getRemoteConfig(app);
 remoteConfig.settings.minimumFetchIntervalMillis = 10000;
 remoteConfig.defaultConfig = {
   chat_title: 'Chat room',
 };
-export const firestore = getFirestore(app);
-export const auth = getAuth();
-export const storage = getStorage();
+export const analytics = getAnalytics(app);

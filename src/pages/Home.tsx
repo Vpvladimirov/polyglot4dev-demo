@@ -1,10 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.scss';
-import { signInAnonymously } from 'firebase/auth';
-import { analytics, auth, firestore } from '../Firebase';
 import { useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
-import { logEvent } from 'firebase/analytics';
+import { loginAnonymously } from '../firebase-utils';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -15,7 +12,7 @@ const Home = () => {
     setUsername(e.target.value);
   };
 
-  const signIn = (e: React.FormEvent<HTMLFormElement>) => {
+  const signIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!username) {
@@ -23,23 +20,9 @@ const Home = () => {
       return;
     }
 
-    signInAnonymously(auth)
-      .then(async (param) => {
-        await setDoc(doc(firestore, 'users', param.user.uid), {
-          username,
-        });
+    await loginAnonymously(username);
 
-        logEvent(analytics, 'user_sign_in', {
-          username,
-        });
-
-        navigate('/chat');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        alert(`Error signing in with code ${errorCode}: ${errorMessage}`);
-      });
+    navigate('/chat');
   };
 
   return (

@@ -9,17 +9,15 @@ const useAuth = () => {
     setIsLoading(true);
 
     auth.onAuthStateChanged((user) => {
-      console.log('use auth state change', user);
-
       setIsLoggedIn(!!user);
-
       setIsLoading(false);
     });
   }, []);
 
   return {
-    isLoading, isLoggedIn,
-  }
+    isLoading,
+    isLoggedIn,
+  };
 };
 
 export default useAuth;
