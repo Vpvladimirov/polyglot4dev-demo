@@ -8,6 +8,7 @@
     overflow: auto;
     display: flex;
     flex-direction: column-reverse;
+    flex: 1;
 
     .message {
       padding: 15px 27%;
